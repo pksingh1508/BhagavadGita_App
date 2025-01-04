@@ -1,0 +1,25 @@
+{
+  "cli": {
+    "version": ">= 14.2.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_KEY": "b2787068b8mshc50e0100b304c44p1b9225jsnc53d4cd7a394",
+        "EXPO_PUBLIC_CHAPTER_URL": "https://bhagavad-gita3.p.rapidapi.com/v2/chapters/"
+      }
+    },
+    "production": {
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

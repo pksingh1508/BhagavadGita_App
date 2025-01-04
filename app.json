@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "BhagwadGita",
+    "name": "Bhagavad Gita",
     "slug": "BhagwadGita",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,19 +8,22 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "icon": {
+        "light": "./assets/images/icon.png",
+        "dark": "./assets/images/icon.png"
+      },
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#fa9a01"
+      },
+      "package": "com.pawankumar1212.BhagwadGita"
     },
     "web": {
       "bundler": "metro",
@@ -28,10 +31,27 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash.png",
+          "imageWidth": 250,
+          "resizeMode": "contain",
+          "backgroundColor": "#fa9a01"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "6de901f9-0429-4640-9a69-67564d17754a"
+      }
     }
   }
 }
