@@ -1,16 +1,80 @@
-import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, Modal, TouchableOpacity, ScrollView, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { ChapterResponseProps } from '@/types'
 import Colors from '@/constants/Colors'
 import Button from './Button'
 import { router } from 'expo-router'
+import * as Speech from 'expo-speech';
+import { FontAwesome5 } from '@expo/vector-icons'
 
 const SingleChapters = ({id, name, name_meaning, chapter_number, verses_count, chapter_summary, chapter_summary_hindi}: ChapterResponseProps) => {
   const [visible, setVisible] = useState(false);
-  const verseBtnHandler = () => {
+  const [isHindiSpeaking, setIsHindiSpeaking] = useState(false);
+  const [isEnglishSpeaking, setIsEnglishSpeaking] = useState(false);
+  const verseBtnHandler = async () => {
+    const isSpeechInProgress = await Speech.isSpeakingAsync();
+    if (isSpeechInProgress) {
+      setIsHindiSpeaking(false);
+      setIsEnglishSpeaking(false);
+      await Speech.stop();
+    }
     setVisible(false);
     router.push(`/chapter/${id}`);
   }
+
+  const startHindiSpeaking = async () => {
+    setIsEnglishSpeaking(false);
+    const isSpeechInProgress = await Speech.isSpeakingAsync();
+    
+    if (isSpeechInProgress) {
+        await Speech.stop();
+        setIsHindiSpeaking(false);
+    } else {
+      setIsHindiSpeaking(true);
+        try {
+            await Speech.speak(chapter_summary_hindi, {
+                language: 'hi-IN',
+                pitch: 1,
+                rate: 0.75,
+                onDone: () => setIsHindiSpeaking(false),
+                onError: (error) => {
+                    console.log('Error:', error);
+                    setIsHindiSpeaking(false);
+                }
+            });
+        } catch (error) {
+            console.log('Error:', error);
+            setIsHindiSpeaking(false);
+        }
+    }
+  };
+  const startEnglishSpeaking = async () => {
+    setIsHindiSpeaking(false);
+    const isSpeechInProgress = await Speech.isSpeakingAsync();
+    
+    if (isSpeechInProgress) {
+        await Speech.stop();
+        setIsEnglishSpeaking(false);
+    } else {
+        setIsEnglishSpeaking(true);
+        try {
+            await Speech.speak(chapter_summary, {
+                language: 'en',
+                pitch: 1,
+                rate: 1,
+                onDone: () => setIsEnglishSpeaking(false),
+                onError: (error) => {
+                    console.log('Error:', error);
+                    setIsEnglishSpeaking(false);
+                }
+            });
+        } catch (error) {
+            console.log('Error:', error);
+            setIsEnglishSpeaking(false);
+        }
+    }
+  };
+
   return (
     <TouchableOpacity style={styles.container} onPress={() => setVisible(true)}>
       <Text style={[styles.text, {color: Colors.orange}]}>Chapter : {chapter_number}</Text>
@@ -32,9 +96,27 @@ const SingleChapters = ({id, name, name_meaning, chapter_number, verses_count, c
           <Text style={styles.modalChapterName}>{name}</Text>
           <Text style={styles.modalChapterName}>{name_meaning}</Text>
           <View style={styles.modalSummary}>
+            {!isHindiSpeaking ? (
+              <TouchableOpacity style={{padding: 7}} onPress={startHindiSpeaking}>
+                <FontAwesome5 name="play-circle" size={26} color={Colors.orange} />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={{padding: 7}} onPress={startHindiSpeaking}>
+                <FontAwesome5 name="pause-circle" size={26} color={Colors.orange} />
+              </TouchableOpacity>
+            )}
             <Text style={styles.summaryText}>{chapter_summary_hindi}</Text>
           </View>
           <View style={styles.modalSummary}>
+            {!isEnglishSpeaking ? (
+              <TouchableOpacity style={{padding: 7}} onPress={startEnglishSpeaking}>
+                <FontAwesome5 name="play-circle" size={26} color={Colors.orange} />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={{padding: 7}} onPress={startEnglishSpeaking}>
+                <FontAwesome5 name="pause-circle" size={26} color={Colors.orange} />
+              </TouchableOpacity>
+            )}
             <Text style={styles.summaryText}>{chapter_summary}</Text>
           </View>
           <View style={{marginVertical: 20}}>
@@ -92,7 +174,9 @@ const styles = StyleSheet.create({
       backgroundColor: Colors.backgroundFade,
       padding: 10,
       borderRadius: 8,
-      marginVertical: 10
+      marginVertical: 10,
+      alignItems: 'center',
+      justifyContent: 'center'
     },
     summaryText: {
       color: Colors.whiteFade,
